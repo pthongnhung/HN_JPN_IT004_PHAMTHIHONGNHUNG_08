@@ -13,7 +13,6 @@ typedef struct Node {
     struct Node* left;
     struct Node* right;
 } Node;
-
 Node* createNode(Student s) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->data = s;
