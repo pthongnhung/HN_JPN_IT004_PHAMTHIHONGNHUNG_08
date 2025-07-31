@@ -92,7 +92,6 @@ int main() {
     Stack* forward = createStack(100);
     Operation current;
     int choice;
-
     do {
         printf("\n==========WEB HISTORY==========\n");
         printf("1. VISIT url\n");
