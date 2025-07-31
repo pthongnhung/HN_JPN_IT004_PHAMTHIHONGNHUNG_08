@@ -1,116 +1,98 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef struct Student {
     int id;
     char name[100];
     int age;
-}Student;
+} Student;
+
 typedef struct Node {
-    Student student;
+    Student data;
     struct Node* left;
     struct Node* right;
-}Node;
-Node* createNode(Student data) {
-    Node* newNode=(Node*)malloc(sizeof(Node));
-    newNode->student=data;
-    newNode->left=NULL;
-    newNode->right=NULL;
-    return newNode;
-}
-int generateID() {
-    static int id=0;
-    id++;
-    return id;
-}
-Node* insertStudent(Node* root, Student student) {
-    if (!root) {
-        printf("Da them phan tu vao cay\n");
-        return root;
-    }
-    while (root->left) {
-        if (root->left==NULL) {
-            root->left=createNode(student);
-        }
-        break;
-    }
-    while (root->right) {
-        if (root->right==NULL) {
-            root->right=createNode(root->student);
-        }
-        break;
-    }
+} Node;
 
+Node* createNode(Student s) {
+    Node* node = (Node*)malloc(sizeof(Node));
+    node->data = s;
+    node->left = node->right = NULL;
+    return node;
 }
-void printInorder(Node* root) {
-    if (!root) {
-        return;
-    }
-    printInorder(root->left);
-    printf("%d ",root->student.id);
-    printInorder(root->right);
-    printf("\n");
+
+Node* insert(Node* root, Student s) {
+    if (root == NULL) return createNode(s);
+    if (s.id < root->data.id)
+        root->left = insert(root->left, s);
+    else if (s.id > root->data.id)
+        root->right = insert(root->right, s);
+    else
+        printf("Sinh vien co ID %d da ton tai\n", s.id);
+    return root;
 }
-void searchId(Node* root,int id) {
-    if (!root) {
-        return;
-    }
-    if (root->student.id==id) {
-        printf("%d ",root->student.id);
-        printf("%s\t",root->student.name);
-        printf("%d\t",root->student.age);
-        printf("\n");
+
+void inorder(Node* root) {
+    if (root) {
+        inorder(root->left);
+        printf("ID: %d | Ten: %s | Tuoi: %d\n", root->data.id, root->data.name, root->data.age);
+        inorder(root->right);
     }
 }
+
+void freeTree(Node* root) {
+    if (root) {
+        freeTree(root->left);
+        freeTree(root->right);
+        free(root);
+    }
+}
+
 int main() {
+    Node* root = NULL;
     int choice;
-    Node* root=createNode(3);
-    Node* node2=createNode(4);
-    Node* node3=createNode(5);
-    Node* node4=createNode(6);
-    root->left=node2;
-    root->right=node3;
-    node2->left=node4;
 
     do {
-        printf("1.Them sinh vien\n");
-        printf("2.Hiem thi danh sach sinh vien\n");
-        printf("3.Tim kiem sinh vien\n");
-        printf("4.Xoa sinh vien\n");
-        printf("5.Thoat");
-        printf("Nhap lua chon cua ban: ");
-        scanf("%d",&choice);
-        switch(choice) {
-            case 1:
-                Student student;
-                student.id=generateID();
-                printf("Nhap ten sinh vien: ");
-                fgets(student.name,100,stdin);
-                student.name[strlen(student.name)]='\0';
+        printf("\n========= STUDENT MANAGER ==========\n");
+        printf("1. THEM SINH VIEN\n");
+        printf("2. HIEN THI DANH SACH SINH VIEN\n");
+        printf("3. TIM KIEM SINH VIEN\n");
+        printf("4. XOA SINH VIEN\n");
+        printf("5. THOAT\n");
+        printf("Chon chuc nang: ");
+        scanf("%d", &choice);
+        getchar();
 
-                printf("Nhap tuoi cua sinh vien: ");
-                scanf("%d",&student.age);
+        switch (choice) {
+            case 1: {
+                Student s;
+                printf("Nhap ID: ");
+                scanf("%d", &s.id);
                 getchar();
-
-                insertStudent(root,student);
+                printf("Nhap ten: ");
+                fgets(s.name, sizeof(s.name), stdin);
+                s.name[strcspn(s.name, "\n")] = '\0';
+                printf("Nhap tuoi: ");
+                scanf("%d", &s.age);
+                root = insert(root, s);
                 break;
+            }
             case 2:
-                printInorder(root);
+                inorder(root);
                 break;
             case 3:
-                int id;
-                printf("Nhap id can tim kiem: ");
-                scanf("%d",&id);
-                searchId(root,id);
                 break;
             case 4:
                 break;
             case 5:
-                printf("Cam on ban da dung chuong trinh\n");
+                printf("Dang thoat chuong trinh\n");
                 break;
-                default:
-                printf("Vui long nhap lua chon hop le\n");
+            default:
+                printf("Lua chon khong hop le\n");
         }
-    }while (choice!=5);
+
+    } while (choice != 5);
+
+    freeTree(root);
     return 0;
 }
